@@ -1,4 +1,6 @@
 defmodule Pizza do
+  import Nx.Defn
+
   @precision      1.0e-4
   @lr             1.0e-3
   @max_iterations 10000
@@ -40,21 +42,21 @@ defmodule Pizza do
     end
   end
 
-  def predict(x, w) do
+  defn predict(x, w) do
     Nx.dot(x, w)
   end
 
-  def loss(x, y, w) do
+  defn loss(x, y, w) do
     x
-    |> Nx.dot(w)
+    |> predict(w)
     |> Nx.subtract(y)
     |> Nx.power(2)
     |> Nx.mean()
   end
 
-  def gradient(x, y, w) do
+  defn gradient(x, y, w) do
     diff = x
-    |> Nx.dot(w)
+    |> predict(w)
     |> Nx.subtract(y)
 
     x
