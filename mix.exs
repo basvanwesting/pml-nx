@@ -23,7 +23,8 @@ defmodule Neural.MixProject do
     [
       {:axon, "~> 0.2.0"},
       {:exla, "~> 0.3.0"},
-      {:nx, "~> 0.3.0"}
+      {:nx, "~> 0.3.0"},
+      {:scidata, "~> 0.1.9"}
     ]
   end
 end
