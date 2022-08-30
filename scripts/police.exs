@@ -9,10 +9,15 @@ defmodule Police do
     reservations = [13, 2,  14, 23, 13, 1,  18, 10, 26, 3,  3,  21, 7,  22, 2,  27, 6,  10, 18, 15, 9,  26, 8,  15, 10, 21, 5,  6,  13, 13]
     temperatures = [26, 14, 20, 25, 24, 12, 23, 18, 24, 14, 12, 27, 17, 21, 12, 26, 15, 21, 18, 26, 20, 25, 21, 22, 20, 21, 12, 14, 19, 20]
     tourists     = [9,  6,  3,  9,  8,  2,  9,  10, 3,  1,  3,  5,  3,  1,  4,  2,  4,  7,  3,  8,  6,  9,  10, 7,  2,  1,  7,  9,  4,  3]
-    bias         = Enum.map(reservations, fn _ -> 1 end)
     polices      = [1,  0,  1,  1,  1,  0,  1,  1,  1,  0,  0,  1,  0,  1,  0,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0]
 
-    x = Nx.tensor([bias, reservations, temperatures, tourists]) |> Nx.transpose()
+    x = [reservations, temperatures, tourists]
+        |> Nx.tensor()
+        |> Nx.transpose()
+
+    bias = Nx.broadcast(1, {Nx.axis_size(x, 0), 1})
+    x = Nx.concatenate([bias, x], axis: 1)
+
     y = Nx.tensor([polices]) |> Nx.transpose()
     w = Nx.broadcast(0, {4, 1})
 
