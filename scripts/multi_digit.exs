@@ -1,8 +1,8 @@
-defmodule SingleDigit do
+defmodule MultiDigit do
   import Nx.Defn
 
   @lr             1.0e-5
-  @max_iterations 100
+  @max_iterations 200
 
   def call do
     IO.inspect(Nx.default_backend(), label: "Nx backend")
@@ -15,7 +15,7 @@ defmodule SingleDigit do
     IO.inspect(x_test)
     IO.inspect(y_test)
 
-    w = Nx.broadcast(0, {Nx.axis_size(x_train, 1), 1})
+    w = Nx.broadcast(0, {Nx.axis_size(x_train, 1), Nx.axis_size(y_train, 1)})
 
     IO.inspect(w)
 
@@ -44,7 +44,7 @@ defmodule SingleDigit do
       labels_binary
       |> Nx.from_binary(labels_type)
       |> Nx.new_axis(-1)
-      |> Nx.equal(5)
+      |> Nx.equal(Nx.tensor(Enum.to_list(0..9)))
 
     bias = Nx.broadcast(1, {Nx.axis_size(x_train, 0), 1})
     x_train = Nx.concatenate([bias, x_train], axis: 1)
@@ -72,7 +72,6 @@ defmodule SingleDigit do
       labels_binary
       |> Nx.from_binary(labels_type)
       |> Nx.new_axis(-1)
-      |> Nx.equal(5)
 
     bias = Nx.broadcast(1, {Nx.axis_size(x_test, 0), 1})
     x_test = Nx.concatenate([bias, x_test], axis: 1)
@@ -115,16 +114,21 @@ defmodule SingleDigit do
   defn classify(x, w) do
     x
     |> forward(w)
-    |> Nx.round()
+    |> Nx.argmax(axis: 1)
+    |> Nx.new_axis(-1)
   end
 
   defn loss(x, y, w) do
     y_hat = forward(x, w)
 
-    first_term = y * Nx.log(y_hat)
-    second_term = Nx.subtract(1, y) * Nx.log(Nx.subtract(1, y_hat))
+    first_term = Nx.multiply(y, Nx.log(y_hat))
+    second_term = Nx.multiply(Nx.subtract(1, y), Nx.log(Nx.subtract(1, y_hat)))
 
-    Nx.negate(Nx.mean(Nx.add(first_term, second_term)))
+    first_term
+    |> Nx.add(second_term)
+    |> Nx.sum()
+    |> Nx.divide(Nx.axis_size(x, 0))
+    |> Nx.negate()
   end
 
   defn gradient(x, y, w) do
@@ -139,5 +143,5 @@ defmodule SingleDigit do
   end
 end
 
-SingleDigit.call()
+MultiDigit.call()
 
