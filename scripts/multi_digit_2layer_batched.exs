@@ -1,20 +1,21 @@
 defmodule MultiDigit2LayerBatched do
   import Nx.Defn
 
-  @lr             1.0e-2
-  @n_hidden_nodes 200
+  @lr             1.0
+  @n_hidden_nodes 128
   @batch_size     256
   @epochs         10
 
   def call do
     #IO.inspect(Nx.default_backend(), label: "Nx backend")
 
-    {x_train, y_train} = load_training_data()
-    {x_test,  y_test}  = load_testing_data()
+    {x_train,    y_train}    = load_training_data()
+    {x_test_all, y_test_all} = load_testing_data()
+    {x_train, x_test_all} = standardize_data(x_train, x_test_all)
 
-    test_batch_size = Nx.axis_size(x_test, 0) |> div(2)
-    [x_validate, x_test | _rest] = Nx.to_batched(x_test, test_batch_size) |> Enum.to_list()
-    [y_validate, y_test | _rest] = Nx.to_batched(y_test, test_batch_size) |> Enum.to_list()
+    test_batch_size = Nx.axis_size(x_test_all, 0) |> div(2)
+    [x_validate, x_test | _rest] = Nx.to_batched(x_test_all, test_batch_size) |> Enum.to_list()
+    [y_validate, y_test | _rest] = Nx.to_batched(y_test_all, test_batch_size) |> Enum.to_list()
 
     #IO.inspect(x_train)
     #IO.inspect(y_train)
@@ -25,7 +26,8 @@ defmodule MultiDigit2LayerBatched do
 
     {w1, w2} = train(x_train, y_train, x_validate, y_validate, @n_hidden_nodes, @epochs, @batch_size, @lr)
 
-    report("_", "_", x_train, y_train, x_test, y_test, w1, w2)
+    report("_", "val", x_train, y_train, x_validate, y_validate, w1, w2)
+    report("_", "test", x_train, y_train, x_test, y_test, w1, w2)
   end
 
   def load_training_data() do
@@ -77,6 +79,15 @@ defmodule MultiDigit2LayerBatched do
     {x_test, y_test}
   end
 
+  def standardize_data(x_train, x_test) do
+    average = Nx.mean(x_train)
+    standard_deviation = Nx.standard_deviation(x_train)
+    {
+      Nx.subtract(x_train, average) |> Nx.divide(standard_deviation),
+      Nx.subtract(x_test, average)  |> Nx.divide(standard_deviation)
+    }
+  end
+
   def train(x_train, y_train, x_test, y_test, n_hidden_nodes, epochs, batch_size, lr) do
     n_input_variables = Nx.axis_size(x_train, 1)
     n_classes = Nx.axis_size(y_train, 1)
@@ -98,7 +109,10 @@ defmodule MultiDigit2LayerBatched do
         w1 = Nx.subtract(w1, Nx.multiply(w1_gradient, lr))
         w2 = Nx.subtract(w2, Nx.multiply(w2_gradient, lr))
 
-        report(epoch, batch_index, x_train_batch, y_train_batch, x_test, y_test, w1, w2)
+        if rem(epoch, 2) == 0 && batch_index == 0 do
+          report(epoch, batch_index, x_train_batch, y_train_batch, x_test, y_test, w1, w2)
+        end
+
         {w1, w2}
     end
   end
