@@ -1,11 +1,12 @@
-defmodule MNIST do
+defmodule SingleDigit do
   import Nx.Defn
 
-  @precision      1.0e-6
   @lr             1.0e-5
   @max_iterations 100
 
   def call do
+    IO.inspect(Nx.default_backend(), label: "Nx backend")
+
     {x_train, y_train} = load_training_data()
     {x_test,  y_test}  = load_testing_data()
 
@@ -99,20 +100,10 @@ defmodule MNIST do
     IO.inspect({iterations_left, current_loss}, label: "iteration, loss")
 
     gradient = gradient(x, y, w)
-    threshold = gradient
-                |> Nx.abs()
-                |> Nx.reduce_max()
-                |> Nx.to_number()
-                |> Kernel.*(lr)
-
     #IO.inspect({gradient, threshold}, label: "gradient, threshold")
 
-    if threshold < @precision do
-      {w, iterations_left}
-    else
-      new_w = Nx.subtract(w, Nx.multiply(gradient, lr))
-      train(x, y, new_w, iterations_left - 1, lr)
-    end
+    new_w = Nx.subtract(w, Nx.multiply(gradient, lr))
+    train(x, y, new_w, iterations_left - 1, lr)
   end
 
   defn forward(x, w) do
@@ -148,5 +139,5 @@ defmodule MNIST do
   end
 end
 
-MNIST.call()
+SingleDigit.call()
 
