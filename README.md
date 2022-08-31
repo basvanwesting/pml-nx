@@ -1,21 +1,18 @@
 # Neural
 
-**TODO: Add description**
+Working through the book [Programming Machine Learning, by Paolo Perrotta](https://pragprog.com/titles/pplearn/programming-machine-learning/)
+Implement using Elixir Nx with XLA backend, instead of Python as in the book.
 
-## Installation
+Chapters are coded in the scripts folder.
+Usage example: `mix run scripts/multi_digit.exs`
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `neural` to your list of dependencies in `mix.exs`:
+Compiling XLA (CPU backend):
 
-```elixir
-def deps do
-  [
-    {:neural, "~> 0.1.0"}
-  ]
-end
 ```
+brew install bazelisk
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/neural>.
+export USE_BAZEL_VERSION=4.2.1
+bazelisk
 
+mix deps.clean xla --build && XLA_BUILD=true mix deps.compile
+```
