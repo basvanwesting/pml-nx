@@ -145,4 +145,3 @@ defmodule MultiDigit do
 end
 
 MultiDigit.call()
-
