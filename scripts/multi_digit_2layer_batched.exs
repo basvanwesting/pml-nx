@@ -12,19 +12,24 @@ defmodule MultiDigit2LayerBatched do
     {x_train, y_train} = load_training_data()
     {x_test,  y_test}  = load_testing_data()
 
+    test_batch_size = Nx.axis_size(x_test, 0) |> div(2)
+    [x_validate, x_test | _rest] = Nx.to_batched(x_test, test_batch_size) |> Enum.to_list()
+    [y_validate, y_test | _rest] = Nx.to_batched(y_test, test_batch_size) |> Enum.to_list()
+
     #IO.inspect(x_train)
     #IO.inspect(y_train)
+    #IO.inspect(x_validate)
+    #IO.inspect(y_validate)
     #IO.inspect(x_test)
     #IO.inspect(y_test)
 
-    {w1, w2} = train(x_train, y_train, x_test, y_test, @n_hidden_nodes, @epochs, @batch_size, @lr)
+    {w1, w2} = train(x_train, y_train, x_validate, y_validate, @n_hidden_nodes, @epochs, @batch_size, @lr)
 
     report("_", "_", x_train, y_train, x_test, y_test, w1, w2)
   end
 
   def load_training_data() do
     {train_images, train_labels} = Scidata.MNIST.download()
-    #{test_images, test_labels} = Scidata.MNIST.download_test()
 
     {images_binary, images_type, images_shape} = train_images
     {labels_binary, labels_type, _labels_shape} = train_labels
