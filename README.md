@@ -1,7 +1,8 @@
 # Neural
 
 Working through the book [Programming Machine Learning, by Paolo Perrotta](https://pragprog.com/titles/pplearn/programming-machine-learning/)
-Implement using Elixir Nx with XLA backend, instead of Python as in the book.
+
+Implement using [Elixir Nx](https://github.com/elixir-nx/nx) with Google's XLA backend, instead of Python as in the book.
 
 Chapters are coded in the scripts folder.
 Usage example: `mix run scripts/multi_digit.exs`

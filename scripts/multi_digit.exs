@@ -15,7 +15,7 @@ defmodule MultiDigit do
     IO.inspect(x_test)
     IO.inspect(y_test)
 
-    w = Nx.broadcast(0, {Nx.axis_size(x_train, 1), Nx.axis_size(y_train, 1)})
+    w = Nx.broadcast(0, {Nx.axis_size(x_train, 1) + 1, Nx.axis_size(y_train, 1)})
 
     IO.inspect(w)
 
@@ -46,9 +46,6 @@ defmodule MultiDigit do
       |> Nx.new_axis(-1)
       |> Nx.equal(Nx.tensor(Enum.to_list(0..9)))
 
-    bias = Nx.broadcast(1, {Nx.axis_size(x_train, 0), 1})
-    x_train = Nx.concatenate([bias, x_train], axis: 1)
-
     #IO.inspect(x_train)
     #IO.inspect(y_train)
 
@@ -72,9 +69,6 @@ defmodule MultiDigit do
       labels_binary
       |> Nx.from_binary(labels_type)
       |> Nx.new_axis(-1)
-
-    bias = Nx.broadcast(1, {Nx.axis_size(x_test, 0), 1})
-    x_test = Nx.concatenate([bias, x_test], axis: 1)
 
     #IO.inspect(x_test)
     #IO.inspect(y_test)
@@ -107,6 +101,7 @@ defmodule MultiDigit do
 
   defn forward(x, w) do
     x
+    |> prepend_bias()
     |> Nx.dot(w)
     |> Nx.sigmoid()
   end
@@ -137,9 +132,15 @@ defmodule MultiDigit do
     |> Nx.subtract(y)
 
     x
+    |> prepend_bias()
     |> Nx.transpose()
     |> Nx.dot(diff)
     |> Nx.divide(Nx.axis_size(x, 0))
+  end
+
+  defn prepend_bias(t) do
+    bias = Nx.broadcast(1, {Nx.axis_size(t, 0), 1})
+    Nx.concatenate([bias, t], axis: 1)
   end
 end
 
