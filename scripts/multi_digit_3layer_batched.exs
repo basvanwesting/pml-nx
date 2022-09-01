@@ -1,4 +1,4 @@
-defmodule MultiDigit2LayerBatched do
+defmodule MultiDigit3LayerBatched do
   import Nx.Defn
 
   @lr             1.0
@@ -219,5 +219,5 @@ defmodule MultiDigit2LayerBatched do
 
 end
 
-MultiDigit2LayerBatched.call()
+MultiDigit3LayerBatched.call()
 

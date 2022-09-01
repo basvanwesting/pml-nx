@@ -23,7 +23,7 @@ mix deps.clean xla --build && XLA_BUILD=true mix deps.compile
 
 ```
 # batch_size = 256, epochs = 10, lr = 1.0, n_hidden_nodes = 128, normalized
-mix run scripts/multi_digit_2layer_batched.exs
+mix run scripts/multi_digit_3layer_batched.exs
 
 2-0 > Loss: 0.1612035632133484, Accuracy: 91.5199966430664%
 4-0 > Loss: 0.078809455037117, Accuracy: 95.04000091552734%
@@ -37,7 +37,7 @@ _-test > Loss: 0.03812151029706001, Accuracy: 98.43999481201172%
 
 ```
 # batch_size = 256, epochs = 10, lr = 0.01, n_hidden_nodes = 200
-mix run scripts/multi_digit_2layer_batched.exs
+mix run scripts/multi_digit_3layer_batched.exs
 
 1-0 > Loss: 2.395386219024658, Accuracy: 12.980000495910645%
 1-1 > Loss: 2.3256468772888184, Accuracy: 13.75%
@@ -52,7 +52,7 @@ _-_ > Loss: 0.249597430229187, Accuracy: 92.88999938964844%
 
 
 ```
-mix run scripts/multi_digit_2layer.exs
+mix run scripts/multi_digit_3layer.exs
 
 iteration, loss: {10000, 2.5443921089172363}
 iteration, loss: {9999, 2.474839925765991}

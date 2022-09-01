@@ -1,4 +1,4 @@
-defmodule MultiDigit2Layer do
+defmodule MultiDigit3Layer do
   import Nx.Defn
 
   @lr             1.0e-2
@@ -195,5 +195,5 @@ defmodule MultiDigit2Layer do
 
 end
 
-MultiDigit2Layer.call()
+MultiDigit3Layer.call()
 
