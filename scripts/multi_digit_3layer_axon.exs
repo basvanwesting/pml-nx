@@ -55,6 +55,14 @@ defmodule MultiDigit3LayerAxon do
     |> Axon.Loop.run(test_batches, model_state)
 
     IO.puts("")
+
+    {x1, y1} = hd(test_batches)
+    IO.inspect(y1)
+
+    Axon.predict(model, model_state, x1)
+    |> Nx.argmax(axis: 1)
+    |> Nx.new_axis(-1)
+    |> IO.inspect()
   end
 
   def load_training_data() do
