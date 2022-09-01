@@ -102,7 +102,7 @@ defmodule MultiDigit2LayerBatched do
       {{x_train_batch, y_train_batch}, batch_index} <- Enum.with_index(x_y_train_batches),
       reduce: {w1, w2} do
       {w1, w2} ->
-        {w1_gradient, w2_gradient} = back(x_train_batch, y_train_batch, w1, w2)
+        {w1_gradient, w2_gradient} = back({w1, w2}, x_train_batch, y_train_batch)
         #IO.inspect(w1_gradient, label: "w1_gradient")
         #IO.inspect(w2_gradient, label: "w2_gradient")
 
@@ -127,7 +127,7 @@ defmodule MultiDigit2LayerBatched do
   end
 
   def report(epoch, batch_index, x_train, y_train, x_test, y_test,w1, w2) do
-    current_loss = loss(x_train, y_train, w1, w2) |> Nx.to_number()
+    current_loss = loss({w1, w2}, x_train, y_train) |> Nx.to_number()
     accuracy = classify(x_test, w1, w2)
                |> Nx.equal(y_test)
                |> Nx.mean()
@@ -154,7 +154,7 @@ defmodule MultiDigit2LayerBatched do
     |> Nx.new_axis(-1)
   end
 
-  defn loss(x, y, w1, w2) do
+  defn loss({w1, w2}, x, y) do
     y_hat = forward(x, w1, w2)
 
     Nx.multiply(y, Nx.log(y_hat))
@@ -163,35 +163,39 @@ defmodule MultiDigit2LayerBatched do
     |> Nx.negate()
   end
 
-  defn back(x, y, w1, w2) do
-    h = x
-        |> prepend_bias()
-        |> Nx.dot(w1)
-        |> Nx.sigmoid()
-
-    y_hat = h
-            |> prepend_bias()
-            |> Nx.dot(w2)
-            |> softmax()
-
-    w2_gradient = Nx.dot(
-      prepend_bias(h) |> Nx.transpose(),
-      Nx.subtract(y_hat, y)
-    ) |> Nx.divide(Nx.axis_size(x, 0))
-
-    w1_gradient = Nx.dot(
-      prepend_bias(x) |> Nx.transpose(),
-      Nx.multiply(
-        Nx.dot(
-          Nx.subtract(y_hat, y),
-          Nx.slice_along_axis(w2, 1, Nx.axis_size(w2, 0) - 1, axis: 0) |> Nx.transpose()
-        ),
-        sigmoid_gradient(h)
-      )
-    ) |> Nx.divide(Nx.axis_size(x, 0))
-
-    {w1_gradient, w2_gradient}
+  defn back({w1, w2}, x, y) do
+    grad({w1, w2}, &loss(&1, x, y))
   end
+
+  #defn back({w1, w2}, x, y) do
+    #h = x
+        #|> prepend_bias()
+        #|> Nx.dot(w1)
+        #|> Nx.sigmoid()
+
+    #y_hat = h
+            #|> prepend_bias()
+            #|> Nx.dot(w2)
+            #|> softmax()
+
+    #w2_gradient = Nx.dot(
+      #prepend_bias(h) |> Nx.transpose(),
+      #Nx.subtract(y_hat, y)
+    #) |> Nx.divide(Nx.axis_size(x, 0))
+
+    #w1_gradient = Nx.dot(
+      #prepend_bias(x) |> Nx.transpose(),
+      #Nx.multiply(
+        #Nx.dot(
+          #Nx.subtract(y_hat, y),
+          #Nx.slice_along_axis(w2, 1, Nx.axis_size(w2, 0) - 1, axis: 0) |> Nx.transpose()
+        #),
+        #sigmoid_gradient(h)
+      #)
+    #) |> Nx.divide(Nx.axis_size(x, 0))
+
+    #{w1_gradient, w2_gradient}
+  #end
 
   defn sigmoid_gradient(sigmoid) do
     Nx.multiply(sigmoid, Nx.subtract(1, sigmoid))
