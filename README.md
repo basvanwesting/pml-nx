@@ -22,6 +22,23 @@ mix deps.clean xla --build && XLA_BUILD=true mix deps.compile
 # Results
 
 ```
+# batch_size = 256, epochs = 10, n_hidden_nodes = 128, normalized
+mix run scripts/multi_digit_3layer_axon.exs
+
+Epoch: 0, Batch: 200, accuracy: 0.8543999 loss: 0.5702565
+Batch: 0, accuracy: 0.8952000 loss: 0.3620701
+Epoch: 1, Batch: 200, accuracy: 0.9245958 loss: 0.4086372
+Batch: 0, accuracy: 0.9182000 loss: 0.2803417
+...
+Epoch: 8, Batch: 200, accuracy: 0.9755325 loss: 0.1949677
+Batch: 0, accuracy: 0.9542000 loss: 0.1443061
+Epoch: 9, Batch: 200, accuracy: 0.9785059 loss: 0.1833987
+Batch: 0, accuracy: 0.9558000 loss: 0.1382095
+=== TEST ===
+Batch: 0, accuracy: 0.9808000
+```
+
+```
 # batch_size = 256, epochs = 10, lr = 1.0, n_hidden_nodes = 128, normalized
 mix run scripts/multi_digit_3layer_batched.exs
 
